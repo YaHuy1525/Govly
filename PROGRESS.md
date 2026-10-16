@@ -1,5 +1,45 @@
 # Holistic AI Recreation — Progress
 
+## 🔑 Credentials wired + repo published (latest)
+
+### Local stack now Docker-backed
+- **Postgres 17 in Docker** on **host port 5433** (`docker compose up -d`) — avoids clashing
+  with the system Postgres on 5432. Volume: `holisticai-pgdata`.
+- Re-migrated + re-seeded + re-imported into the container: **610 docs, 43 taxonomies,
+  371 category links**.
+- **Convex** deployed to **`blissful-narwhal-823`** (the user's own project, not the
+  throwaway `marvelous-platypus-539`). Verified live.
+- **Upstash rate limiter** live — verified 10 allowed then `429`s.
+- **GitHub**: pushed to `github.com/YaHuy1525/Govly` — 142 files, `main`, no secrets in tree.
+
+### ⚠️ HubSpot token is INVALID — needs replacing
+`HUBSPOT_ACCESS_TOKEN` returns **401 Unauthorized** from `api.hubapi.com/crm/v3/objects/contacts`.
+The supplied value base64-decodes to a protobuf blob containing app id `ap1-d6b8-…`; HubSpot
+private-app tokens are plain strings beginning **`pat-eu1-`** (EU) or `pat-na1-` (NA).
+Get the right one from HubSpot → Settings → Integrations → **Private Apps** → app → **Auth** tab,
+scope `crm.objects.contacts.write`. Sync code is correct and waiting; it stays a no-op until then.
+
+### Secrets generated this session (values only in gitignored `.env` files)
+| Var | Where |
+|---|---|
+| `PAYLOAD_SECRET` | `apps/cms/.env` |
+| `PREVIEW_SECRET` | `apps/web/.env.local` |
+| `FORMS_ADMIN_TOKEN` | `apps/hai-brain/.env.local` |
+
+### Bugs found & fixed
+1. **Silent wrong-database fallback** — `payload.config.ts` read `process.env.DATABASE_URI`
+   *before* the calling script's `dotenv()` ran (ESM imports are hoisted), so it fell back to a
+   hardcoded 5432 URI and failed auth confusingly. Now the config loads `.env` itself and
+   **throws** if `DATABASE_URI` is missing instead of guessing.
+2. **`.env` written with CRLF** by Python's `write_text` → trailing `\r` in the connection
+   string. Now written with `newline="\n"`.
+3. **130 unhandled rejections in the tracker suite** — the no-op `sendBeacon` was installed
+   behind a `typeof !== "function"` guard, but happy-dom ships a *real* one that does network
+   I/O. Now overridden unconditionally.
+4. **106 MB `evidence/rea-js-analysis.json`** would be rejected by GitHub — gitignored.
+
+---
+
 ## ✅ ALL OPTIONAL ITEMS COMPLETE — full system, verified end-to-end
 
 ### Ports (changed this session)

@@ -1,9 +1,11 @@
-// The tracker prefers navigator.sendBeacon and only falls back to fetch when
-// it is absent. Define a permanent no-op sendBeacon so the fetch fallback
-// (which happy-dom aborts on teardown) is never reached.
-if (typeof navigator !== 'undefined' && typeof navigator.sendBeacon !== 'function') {
-  Object.defineProperty(navigator, 'sendBeacon', {
+// happy-dom ships a REAL navigator.sendBeacon that performs network I/O, so we
+// must override it unconditionally — a `typeof !== "function"` guard never
+// fires here and lets hundreds of real requests escape as unhandled rejections.
+// Tests that need to observe beacons call stubBeacon(), which overrides this.
+if (typeof navigator !== "undefined") {
+  Object.defineProperty(navigator, "sendBeacon", {
     configurable: true,
+    writable: true,
     value: () => true,
   });
 }
