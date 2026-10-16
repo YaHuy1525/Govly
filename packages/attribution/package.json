@@ -1,0 +1,21 @@
+{
+  "name": "@hai/attribution",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./classify": "./src/classify.ts",
+    "./tables": "./src/tables.ts",
+    "./payload": "./src/payload.ts"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "build": "tsc"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.0",
+    "vitest": "^3.0.0"
+  }
+}

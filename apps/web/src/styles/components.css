@@ -1,0 +1,59 @@
+/* Button + badge styles (primitives). */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1;
+  padding: 12px 22px;
+  border-radius: var(--radius-s);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: opacity 0.15s ease, background 0.15s ease;
+  text-decoration: none;
+}
+
+.btn:hover {
+  text-decoration: none;
+}
+
+.btn--primary {
+  background: var(--hai-blurple);
+  color: #fff;
+}
+
+.btn--primary:hover {
+  opacity: 0.9;
+}
+
+.btn--secondary {
+  background: #fff;
+  color: var(--text);
+  border-color: var(--light-grey);
+}
+
+.btn--ghost {
+  background: transparent;
+  color: var(--hai-blurple);
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: var(--soft-purple);
+  color: var(--hai-blurple);
+}
+
+.badge--gartner {
+  background: #002856;
+  color: #fff;
+}

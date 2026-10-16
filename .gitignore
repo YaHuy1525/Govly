@@ -1,0 +1,13 @@
+node_modules/
+dist/
+.next/
+.turbo/
+*.log
+.env*
+!.env.example
+convex/_generated/
+.DS_Store
+
+# Large REA static-analysis output (~106 MB) — exceeds GitHub's file limit.
+# Regenerate with the `rea` CLI if needed; the small captures stay tracked.
+evidence/rea-js-analysis.json

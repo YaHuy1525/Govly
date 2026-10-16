@@ -1,0 +1,29 @@
+{
+  "name": "@hai/cms",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "cross-env PAYLOAD_CONFIG_PATH=src/payload.config.ts next dev -p 3000",
+    "build": "cross-env PAYLOAD_CONFIG_PATH=src/payload.config.ts next build",
+    "generate:types": "payload generate:types",
+    "generate:importmap": "payload generate:importmap",
+    "migrate:create": "payload migrate:create",
+    "migrate": "payload migrate",
+    "typecheck": "tsc --noEmit",
+    "start": "cross-env PAYLOAD_CONFIG_PATH=src/payload.config.ts next start -p 3000"
+  },
+  "dependencies": {
+    "@payloadcms/db-postgres": "^3.0.0",
+    "@payloadcms/next": "^3.0.0",
+    "@payloadcms/richtext-lexical": "^3.0.0",
+    "next": "^15.1.0",
+    "payload": "^3.0.0",
+    "sharp": "^0.33.0"
+  },
+  "devDependencies": {
+    "cross-env": "^7.0.3",
+    "dotenv": "^18.0.7",
+    "typescript": "^5.7.0"
+  }
+}

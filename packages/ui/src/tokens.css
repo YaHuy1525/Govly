@@ -1,0 +1,116 @@
+/* Holistic AI design system — extracted from the live site's
+   holisticai.webflow.shared.42da0e2b0.min.css (artifacts/shared.css). */
+
+:root {
+  /* Brand palette */
+  --hai-blurple: #5049f9;
+  --hai-amethyst: #ab5fce;
+  --hai-cerulean: #36b1fe;
+  --hai-deepblue: #10131c;
+  --light-grey: #e7e8ec;
+  --light-purple: #ded9f9;
+  --soft-purple: #f6f5fd;
+  --text: #262525;
+  --white: #fff;
+  --gartner-match: #002856;
+
+  /* Type — one font for everything */
+  --font-sans: "Geist", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+
+  /* Spacing scale (px) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-24: 96px;
+
+  /* Layout */
+  --page-margin: 32px;
+  --content-max: 1200px;
+
+  /* Radius + shadow */
+  --radius-s: 9px;
+  --radius-m: 14px;
+  --shadow-card: 0 12px 38px rgba(20, 30, 55, 0.06);
+}
+
+@media (max-width: 767px) {
+  :root {
+    --page-margin: 16px;
+  }
+}
+
+/* ── Form app tokens (hai-brain embed) ─────────────────────────────
+   Defaults; overridable per-embed via query params (theme=dark, accent=…).
+   See apps/hai-brain/src/lib/theme.ts for the override contract. */
+.f-form-scope,
+:root {
+  --f-page: #f9fafb;
+  --f-card: #ffffff;
+  --f-text: #101828;
+  --f-label: #182230;
+  --f-muted: #667085;
+  --f-placeholder: #98a2b3;
+  --f-border: #d0d5dd;
+  --f-input-bg: #ffffff;
+  --f-accent: #5049f9;
+  --f-accent-text: #ffffff;
+  --f-radius: 9px;
+  --f-card-radius: 14px;
+  --f-card-border: 1px;
+  --f-shadow: 0 12px 38px rgba(20, 30, 55, 0.06);
+}
+
+/* ── Typography scale ─────────────────────────────────────────────
+   Geist 100–900. Hero 56/64 desktop · h1 40/48 · h2 32/40 ·
+   h3 24/32 · body 16/24 · small 14/20 · label 11 uppercase .15em. */
+.t-hero {
+  font-size: 56px;
+  line-height: 64px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+.t-h1 {
+  font-size: 40px;
+  line-height: 48px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+.t-h2 {
+  font-size: 32px;
+  line-height: 40px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.t-h3 {
+  font-size: 24px;
+  line-height: 32px;
+  font-weight: 600;
+}
+.t-body {
+  font-size: 16px;
+  line-height: 24px;
+}
+.t-small {
+  font-size: 14px;
+  line-height: 20px;
+}
+.t-label {
+  font-size: 11px;
+  font-weight: 450;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--hai-blurple);
+}
+
+@media (max-width: 767px) {
+  .t-hero {
+    font-size: 40px;
+    line-height: 48px;
+  }
+}
