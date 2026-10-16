@@ -28,8 +28,8 @@ export default defineConfig({
       cwd: "../cms",
       env: {
         DATABASE_URI:
-          process.env.DATABASE_URI || "postgresql://postgres:150205@localhost:5432/holisticai",
-        PAYLOAD_SECRET: "dev-secret",
+          process.env.DATABASE_URI || "postgresql://postgres:150205@localhost:5434/holisticai",
+        PAYLOAD_SECRET: process.env.PAYLOAD_SECRET || "dev-secret",
       },
     },
     {
