@@ -5,6 +5,7 @@ declare global {
   interface Window {
     HAITrack: {
       get: () => { first: { channel: string } | null; last: { channel: string } | null; counts: { pageviews: number; sessions: number } };
+      activity: () => { enabled: boolean; consented: boolean };
       channel: () => string;
       fields: (form?: unknown) => Record<string, unknown>;
       version: string;

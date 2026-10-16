@@ -14,12 +14,31 @@
 - **Upstash rate limiter** live — verified 10 allowed then `429`s.
 - **GitHub**: pushed to `github.com/YaHuy1525/Govly` — `main`, no secrets in tree.
 
-### ⚠️ HubSpot token is INVALID — needs replacing
-`HUBSPOT_ACCESS_TOKEN` returns **401 Unauthorized** from `api.hubapi.com/crm/v3/objects/contacts`.
-The supplied value base64-decodes to a protobuf blob containing app id `ap1-d6b8-…`; HubSpot
-private-app tokens are plain strings beginning **`pat-eu1-`** (EU) or `pat-na1-` (NA).
-Get the right one from HubSpot → Settings → Integrations → **Private Apps** → app → **Auth** tab,
-scope `crm.objects.contacts.write`. Sync code is correct and waiting; it stays a no-op until then.
+### ✅ HubSpot lead sync WORKS — one scope still missing
+Token is a valid **`pat-ap1-`** private-app token for portal **443797402** (APAC data residency,
+`app-ap1.hubspot.com`). Read + write on contacts confirmed (`201 Created`).
+
+**Verified end-to-end:** POST `/api/lead` → lead in Convex (`serverChannel: "AI Assistant"` from
+`utm_source=chatgpt.com`) → **contact `361964266958` created in HubSpot**.
+
+**Gap:** the portal defines none of our 9 attribution properties, and HubSpot rejects the *entire*
+write with `400 PROPERTY_DOESNT_EXIST` if one is unknown. Contacts currently sync with **email
+only**. Two things were done about it:
+
+1. **Sync now self-heals** — it fetches the portal's property list (cached 10 min) and sends only
+   properties that exist, so a schema gap can never drop a lead. A 400 still falls back to an
+   email-only retry as a second safety net.
+2. **Properties not yet created** — the token lacks **`crm.schemas.contacts.write`** (403 on
+   `POST /crm/v3/properties/contacts`). Add that scope, then run the creation script and the full
+   attribution payload flows with no code change.
+
+Properties to create: `first_touch_utm_source`, `first_touch_channel`, `last_touch_utm_source`,
+`last_touch_utm_medium`, `last_touch_channel`, `form_name`, `pageview_count`, `session_count`.
+
+**Token history (all rejected before this one):** a base64 protobuf blob embedding app id
+`ap1-d6b8-…` (an *expired OAuth token* — HubSpot said "expired 20742 day(s) ago"), the bare app id
+`ap1-f20a-…`, and a **Personal Access Key** (CLI-only, never valid for REST). The working one came
+from **Settings → Integrations → Private Apps → Auth**.
 
 ### Secrets generated this session (values only in gitignored `.env` files)
 | Var | Where |

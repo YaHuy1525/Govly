@@ -81,11 +81,42 @@ export async function POST(req: Request) {
   return Response.json({ ok: true });
 }
 
+/**
+ * The set of contact properties this portal actually defines.
+ *
+ * HubSpot rejects the ENTIRE write with 400 PROPERTY_DOESNT_EXIST if even one
+ * property is unknown, so sending our full attribution payload to a portal
+ * whose schema hasn't been set up silently drops every lead. Fetch the schema
+ * once and cache it; a newly-added property is picked up within the TTL.
+ * Returns null when the lookup fails, so callers fall back to email-only.
+ */
+let propertyCache: { names: Set<string>; at: number } | null = null;
+const PROPERTY_TTL_MS = 10 * 60_000;
+
+async function knownContactProperties(token: string): Promise<Set<string> | null> {
+  if (propertyCache && Date.now() - propertyCache.at < PROPERTY_TTL_MS) {
+    return propertyCache.names;
+  }
+  try {
+    const res = await fetch(
+      "https://api.hubapi.com/crm/v3/properties/contacts?archived=false",
+      { headers: { Authorization: `Bearer ${token}` } },
+    );
+    if (!res.ok) return null;
+    const json = (await res.json()) as { results?: { name: string }[] };
+    const names = new Set((json.results ?? []).map((p) => p.name));
+    propertyCache = { names, at: Date.now() };
+    return names;
+  } catch {
+    return null;
+  }
+}
+
 async function syncHubSpot(d: z.infer<typeof leadSchema>) {
   const token = process.env.HUBSPOT_ACCESS_TOKEN;
   if (!token) return;
   const [first, ...rest] = String(d.email).split("@");
-  const properties: Record<string, string> = {
+  const wanted: Record<string, string> = {
     email: d.email,
     first_touch_utm_source: d.first_utm_source || "",
     first_touch_channel: d.first_utm_medium || "",
@@ -97,6 +128,15 @@ async function syncHubSpot(d: z.infer<typeof leadSchema>) {
     form_name: d.form_name || "",
     landing_page: d.landing_page || "",
   };
+
+  // Only send properties the portal defines; email always goes.
+  const available = await knownContactProperties(token);
+  const properties: Record<string, string> = available
+    ? Object.fromEntries(
+        Object.entries(wanted).filter(([k]) => k === "email" || available.has(k)),
+      )
+    : { email: d.email };
+
   for (let attempt = 0; attempt < 3; attempt++) {
     try {
       const res = await fetch("https://api.hubapi.com/crm/v3/objects/contacts", {
@@ -112,7 +152,25 @@ async function syncHubSpot(d: z.infer<typeof leadSchema>) {
         await new Promise((r) => setTimeout(r, 500 * 2 ** attempt));
         continue;
       }
-      console.error("[hubspot-sync] failed", res.status, await res.text());
+      const detail = await res.text();
+      // Belt and braces: if a schema mismatch still slips through the filter
+      // above, capture the lead with email alone rather than losing it.
+      if (res.status === 400 && Object.keys(properties).length > 1) {
+        console.warn("[hubspot-sync] 400 — retrying email-only:", detail.slice(0, 300));
+        try {
+          const retry = await fetch("https://api.hubapi.com/crm/v3/objects/contacts", {
+            method: "POST",
+            headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+            body: JSON.stringify({ properties: { email: d.email } }),
+          });
+          if (retry.ok || retry.status === 409) return;
+          console.error("[hubspot-sync] email-only retry failed", retry.status, await retry.text());
+        } catch (err) {
+          console.error("[hubspot-sync] email-only retry threw", err);
+        }
+        return;
+      }
+      console.error("[hubspot-sync] failed", res.status, detail);
       return;
     } catch (err) {
       if (attempt < 2) {
