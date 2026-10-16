@@ -1,6 +1,6 @@
 # Local development stack.
-# Postgres runs on host port 5433 to avoid clashing with any system Postgres
-# already bound to 5432.
+# Host port 5434 — this machine already runs PostgreSQL 17 on 5432 and
+# PostgreSQL 13 on 5433, so the container must avoid both.
 services:
   postgres:
     image: postgres:17-alpine
@@ -11,7 +11,7 @@ services:
       POSTGRES_PASSWORD: 150205
       POSTGRES_DB: holisticai
     ports:
-      - "5433:5432"
+      - "5434:5432"
     volumes:
       - holisticai-pgdata:/var/lib/postgresql/data
     healthcheck:

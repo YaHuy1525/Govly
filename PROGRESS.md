@@ -3,14 +3,16 @@
 ## 🔑 Credentials wired + repo published (latest)
 
 ### Local stack now Docker-backed
-- **Postgres 17 in Docker** on **host port 5433** (`docker compose up -d`) — avoids clashing
-  with the system Postgres on 5432. Volume: `holisticai-pgdata`.
-- Re-migrated + re-seeded + re-imported into the container: **610 docs, 43 taxonomies,
-  371 category links**.
+- **Postgres 17 in Docker** on **host port 5434** (`docker compose up -d`).
+  This machine already runs **PostgreSQL 17 on 5432** *and* **PostgreSQL 13 on 5433**,
+  so the container avoids both. Volume: `holisticai-pgdata`.
+- Migrated + seeded + imported into the container: **610 docs, 43 taxonomies,
+  371 category links**. Verified by an inbound connection from the host
+  (`pg_stat_activity` shows `172.28.0.1` — the Docker bridge gateway).
 - **Convex** deployed to **`blissful-narwhal-823`** (the user's own project, not the
   throwaway `marvelous-platypus-539`). Verified live.
 - **Upstash rate limiter** live — verified 10 allowed then `429`s.
-- **GitHub**: pushed to `github.com/YaHuy1525/Govly` — 142 files, `main`, no secrets in tree.
+- **GitHub**: pushed to `github.com/YaHuy1525/Govly` — `main`, no secrets in tree.
 
 ### ⚠️ HubSpot token is INVALID — needs replacing
 `HUBSPOT_ACCESS_TOKEN` returns **401 Unauthorized** from `api.hubapi.com/crm/v3/objects/contacts`.
@@ -37,6 +39,12 @@ scope `crm.objects.contacts.write`. Sync code is correct and waiting; it stays a
    behind a `typeof !== "function"` guard, but happy-dom ships a *real* one that does network
    I/O. Now overridden unconditionally.
 4. **106 MB `evidence/rea-js-analysis.json`** would be rejected by GitHub — gitignored.
+5. **Docker port collision (5433)** — the container started "healthy" but Docker could not
+   publish a host port already held by the machine's PostgreSQL 13, so every
+   `localhost:5433` connection silently went to PG 13 instead of the container and the
+   Docker volume stayed empty (4 KB). Moved to **5434** and confirmed the data landed in
+   the container this time. **Lesson: verify a container's port actually serves it** —
+   `docker exec … psql` proves nothing about the host-published port.
 
 ---
 
